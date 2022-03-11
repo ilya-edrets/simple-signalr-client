@@ -7,11 +7,20 @@
     <body>
         <div>Configure your SignalR client:</div>
         <hr />
+        <div>Step 1: Create Token</div>
+        <ul>
+            <li><label>Token Endpoint: </label><input type="text" id="tokenEndpoint" /></li>
+            <li><label>Client Id: </label><input type="text" id="client" /></li>
+            <li><label>Client Secret: </label><input type="text" id="clientSecret" /></li>
+            <li><label>Scopes: </label><input type="text" id="scopes" /></li>
+        </ul>
+        <button id="createToken">Create token</button>
+        <hr />
+        <div>Step 2: Connect to hub</div>
         <ul>
             <li><label>Token: </label><input type="text" id="token" /></li>
             <li><label>Delivery method URI: </label><input type="text" id="deliveryMethodUri" /></li>
         </ul>
-        <hr />
         <button id="run">Run</button>
         <button id="stop">Stop</button>
         <hr />
@@ -19,26 +28,68 @@
     </body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aspnet-signalr/1.0.27/signalr.js"></script>
     <script src="log.js"></script>
+    <script src="createToken.js"></script>
+
     <script>
+        EventTarget.prototype.storeAs = function(name) {
+            this.addEventListener("change", (event) => localStorage.setItem(name, event.target.value))
+        }
+
+        EventTarget.prototype.loadAs = function(name) {
+            this.value = localStorage.getItem(name);
+        }
+    </script>
+
+    <script>
+        var tokenEndpointId = "tokenEndpoint";
+        var clientId = "client";
+        var clientSecretId = "clientSecret";
+        var scopesId = "scopes";
+        var createTokenId  = "createToken";
         var tokenId = "token";
         var uriId = "deliveryMethodUri";
         var runId = "run";
         var stopId = "stop";
 
+        var tokenEndpointInput = document.getElementById(tokenEndpointId);
+        var clientInput = document.getElementById(clientId);
+        var clientSecretInput = document.getElementById(clientSecretId);
+        var scopesInput = document.getElementById(scopesId);
+        var createTokenBtn = document.getElementById(createTokenId);
         var tokenInput = document.getElementById(tokenId);
         var uriInput = document.getElementById(uriId);
         var runBtn = document.getElementById(runId);
         var stopBtn = document.getElementById(stopId);
 
-        tokenInput.addEventListener("change", (event) => localStorage.setItem(tokenId, event.target.value));
-        uriInput.addEventListener("change", (event) => localStorage.setItem(uriId, event.target.value));
+        tokenEndpointInput.storeAs(tokenEndpointId);
+        clientInput.storeAs(clientId);
+        clientSecretInput.storeAs(clientSecretId);
+        scopesInput.storeAs(scopesId);
+        tokenInput.storeAs(tokenId);
+        clientInput.storeAs(clientId);
+
+        createTokenBtn.addEventListener("click", async () => await createTokenBtnHandler());
         runBtn.addEventListener("click", () => stop().then(() => run()));
         stopBtn.addEventListener("click", () => stop());
 
         window.onload = function () {
-            tokenInput.value = localStorage.getItem(tokenId);
-            uriInput.value = localStorage.getItem(uriId);
+            tokenEndpointInput.loadAs(tokenEndpointId);
+            clientInput.loadAs(clientId);
+            clientSecretInput.loadAs(clientSecretId);
+            scopesInput.loadAs(scopesId);
+            tokenInput.loadAs(tokenId);
+            uriInput.loadAs(uriId);
         };
+
+        async function createTokenBtnHandler() {
+            try {
+                var response = await createToken(tokenEndpointInput.value, clientInput.value, clientSecretInput.value, scopesInput.value);
+                log("Token created with scopes " + JSON.stringify(response.scope))
+                tokenInput.value = response.access_token
+            } catch (error) {
+                log("Cannot create token", error)
+            }
+        }
 
         function run() {
             var subscription = {
