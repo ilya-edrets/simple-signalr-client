@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SignalR Client</title>
+        <link rel="stylesheet" href="app.css" />
+    </head>
+    <body>
+        <div>Configure your SignalR client:</div>
+        <hr />
+        <ul>
+            <li><label>Token: </label><input type="text" id="token" /></li>
+            <li><label>Delivery method URI: </label><input type="text" id="deliveryMethodUri" /></li>
+        </ul>
+        <hr />
+        <button id="run">Run</button>
+        <button id="stop">Stop</button>
+        <hr />
+        <pre id="out"></pre>
+    </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aspnet-signalr/1.0.27/signalr.js"></script>
+    <script src="log.js"></script>
+    <script>
+        var tokenId = "token";
+        var uriId = "deliveryMethodUri";
+        var runId = "run";
+        var stopId = "stop";
+
+        var tokenInput = document.getElementById(tokenId);
+        var uriInput = document.getElementById(uriId);
+        var runBtn = document.getElementById(runId);
+        var stopBtn = document.getElementById(stopId);
+
+        tokenInput.addEventListener("change", (event) => localStorage.setItem(tokenId, event.target.value));
+        uriInput.addEventListener("change", (event) => localStorage.setItem(uriId, event.target.value));
+        runBtn.addEventListener("click", () => stop().then(() => run()));
+        stopBtn.addEventListener("click", () => stop());
+
+        window.onload = function () {
+            tokenInput.value = localStorage.getItem(tokenId);
+            uriInput.value = localStorage.getItem(uriId);
+        };
+
+        function run() {
+            var subscription = {
+                deliveryMethod: {
+                    uri: uriInput.value,
+                },
+            };
+
+            log("Subscription created");
+
+            window.connection = new signalR.HubConnectionBuilder()
+                .configureLogging(signalR.LogLevel.Warning)
+                .withUrl(subscription.deliveryMethod.uri, {
+                    accessTokenFactory: () => tokenInput.value,
+                })
+                .build();
+            log("connection created");
+
+            connection.on("OnEvent", log);
+            connection.on("OnPresenceEvent", log);
+            connection.on("OnCommandResult", log);
+            connection.onclose(log);
+            connection.onclose(console.log);
+
+            connection
+                .start()
+                .then(() => log("success"))
+                .catch((error) => log(error));
+        }
+
+        function stop() {
+            if (window.connection) {
+                var connection = window.connection;
+                window.connection = undefined;
+                return connection
+                    .stop()
+                    .then(() => log("stopped"))
+                    .catch((error) => log(error));
+            }
+
+            return Promise.resolve();
+        }
+    </script>
+</html>
