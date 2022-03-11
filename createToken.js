@@ -1,21 +1,19 @@
 async function createToken(authorizationEndpoint, client, clientSecret, scopes) {
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
-    var urlencoded = new URLSearchParams();
-    urlencoded.append("grant_type", "client_credentials");
-    urlencoded.append("client_id", client);
-    urlencoded.append("client_secret", clientSecret);
-    urlencoded.append("scope", scopes);
+    const body = new URLSearchParams();
+    body.append("grant_type", "client_credentials");
+    body.append("client_id", client);
+    body.append("client_secret", clientSecret);
+    body.append("scope", scopes);
 
     var requestOptions = {
+        credentials: "omit",
+        mode: "same-origin",
         method: "POST",
-        headers: myHeaders,
-        body: urlencoded,
-        redirect: "follow",
+        body,
     };
 
     var response = await fetch(authorizationEndpoint, requestOptions);
+    var result = await response.text();
 
-    return response.json();
+    return result;
 }
