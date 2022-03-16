@@ -41,42 +41,42 @@
     </script>
 
     <script>
-        var tokenEndpointId = "tokenEndpoint";
-        var clientId = "client";
-        var clientSecretId = "clientSecret";
-        var scopesId = "scopes";
-        var createTokenId  = "createToken";
+        // var tokenEndpointId = "tokenEndpoint";
+        // var clientId = "client";
+        // var clientSecretId = "clientSecret";
+        // var scopesId = "scopes";
+        // var createTokenId  = "createToken";
         var tokenId = "token";
         var uriId = "deliveryMethodUri";
         var runId = "run";
         var stopId = "stop";
 
-        var tokenEndpointInput = document.getElementById(tokenEndpointId);
-        var clientInput = document.getElementById(clientId);
-        var clientSecretInput = document.getElementById(clientSecretId);
-        var scopesInput = document.getElementById(scopesId);
-        var createTokenBtn = document.getElementById(createTokenId);
+        // var tokenEndpointInput = document.getElementById(tokenEndpointId);
+        // var clientInput = document.getElementById(clientId);
+        // var clientSecretInput = document.getElementById(clientSecretId);
+        // var scopesInput = document.getElementById(scopesId);
+        // var createTokenBtn = document.getElementById(createTokenId);
         var tokenInput = document.getElementById(tokenId);
         var uriInput = document.getElementById(uriId);
         var runBtn = document.getElementById(runId);
         var stopBtn = document.getElementById(stopId);
 
-        tokenEndpointInput.storeAs(tokenEndpointId);
-        clientInput.storeAs(clientId);
-        clientSecretInput.storeAs(clientSecretId);
-        scopesInput.storeAs(scopesId);
+        // tokenEndpointInput.storeAs(tokenEndpointId);
+        // clientInput.storeAs(clientId);
+        // clientSecretInput.storeAs(clientSecretId);
+        // scopesInput.storeAs(scopesId);
         tokenInput.storeAs(tokenId);
-        clientInput.storeAs(clientId);
+        uriInput.storeAs(uriId);
 
-        createTokenBtn.addEventListener("click", async () => await createTokenBtnHandler());
+        // createTokenBtn.addEventListener("click", async () => await createTokenBtnHandler());
         runBtn.addEventListener("click", () => stop().then(() => run()));
         stopBtn.addEventListener("click", () => stop());
 
         window.onload = function () {
-            tokenEndpointInput.loadAs(tokenEndpointId);
-            clientInput.loadAs(clientId);
-            clientSecretInput.loadAs(clientSecretId);
-            scopesInput.loadAs(scopesId);
+            // tokenEndpointInput.loadAs(tokenEndpointId);
+            // clientInput.loadAs(clientId);
+            // clientSecretInput.loadAs(clientSecretId);
+            // scopesInput.loadAs(scopesId);
             tokenInput.loadAs(tokenId);
             uriInput.loadAs(uriId);
         };
